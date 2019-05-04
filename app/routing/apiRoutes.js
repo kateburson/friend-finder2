@@ -1,4 +1,5 @@
 var friends = require('../data/friends.js');
+console.log('friends:', friends);
 
 module.exports = function(app) {
 
@@ -7,34 +8,26 @@ module.exports = function(app) {
   });
 
   app.post('/api/friends', function(req, res) {
-    var match = {
-      name: '',
-      photo: ''
-    };
+    let bestMatch;
+    let currentBestScore = 100;
+    const newFriend = req.body;
 
-    match(req);
-    res.json(match);
-
-    // friends.push(req.body);
-
-    function match(req) {
-      newFriend = req.body;
-      var difference = 40;
-      for(var i = 0; i < friends.length; i++) {
-        var newFriendSum = newFriend.scores.reduce((a,b) => a + b, 0);
-        var friendSum = friends[i].scores.reduce((a,b) => a + b, 0);
-        var diff = Math.abs(newFriendSum - friendSum);
-        if(diff < difference) {
-          return (
-            match.name = friends[i].name,
-            match.photo = friends[i].photo
-          );
+    for(let i = 0; i < friends.length; i++) {
+      let sum = 0;
+      for(let j = 0; j < newFriend.scores.length; j++) {
+        sum += Math.abs(newFriend.scores[j] - friends[i].scores[j]);
+        console.log('Sum:', sum);
+        if(sum < currentBestScore) {
+          console.log('best score:',currentBestScore);
+          currentBestScore = sum;
+          bestMatch = friends[i];
+          console.log(bestMatch);
+          res.send(bestMatch);
         } else {
-          console.log('no match');
+          res.send('No match :(');
         }
-      } 
+      };
     }
-
   });
-  
-};
+}
+
